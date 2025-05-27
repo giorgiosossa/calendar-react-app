@@ -18,7 +18,7 @@ const userData = {
       name: "Assignment Deadline",
       description: "Final submission for the UX research project",
       startTime: "08:00",
-      endTime: "17:00",
+      endTime: "10:00",
       date: "2025-05-14",
       tags: ["Work", "Deadline"],
       genre: "Academic",
@@ -129,7 +129,7 @@ export default function CalendarPage() {
 
     return {
       transform: `translateY(-${cardIndex * baseOffset}px) scale(${1 - cardIndex * scaleReduction})`,
-      zIndex: 10 - cardIndex,
+      zIndex: cardIndex + 1, // First card (index 0) = z-index 1, last card (index 2) = z-index 3
       transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
     }
   }
@@ -211,27 +211,27 @@ export default function CalendarPage() {
               {!isDesktop && selectedDateActivities.length > 0 && (
                 <div
                   ref={activitiesCardRef}
-                  className="bg-[#232323] rounded-3xl p-6 shadow-sm border border-gray-100 relative"
+                  className="bg-[#d7d4d5] rounded-3xl p-6 shadow-sm border border-gray-100 relative"
                   style={getCardTransform(2)}
                 >
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-semibold text-gray-100">
+                    <h3 className="font-semibold text-[261f0f]">
                       {selectedDate.toLocaleDateString("en-US", {
                         weekday: "long",
                         month: "long",
                         day: "numeric",
                       })}
                     </h3>
-                    <span className="text-sm text-gray-100">{selectedDateActivities.length} events</span>
+                    <span className="text-sm text-[261f0f]">{selectedDateActivities.length} events</span>
                   </div>
 
                   <div className="space-y-3">
                     {selectedDateActivities.slice(0, 3).map((activity) => (
-                      <div key={activity.id} className="flex items-center space-x-3 p-0 bg-[#232323] rounded-2xl">
+                      <div key={activity.id} className="flex items-center space-x-3 p-0 bg-[#d7d4d5] rounded-2xl">
                         <div className={`w-3 h-3 rounded-full ${activity.color}`}></div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-gray-100 truncate">{activity.name}</p>
-                          <p className="text-sm text-gray-100">
+                          <p className="font-medium text-[261f0f] truncate">{activity.name}</p>
+                          <p className="text-sm text-[261f0f]">
                             {activity.startTime} - {activity.endTime}
                           </p>
                         </div>
@@ -241,7 +241,7 @@ export default function CalendarPage() {
                     {selectedDateActivities.length > 3 && (
                       <Button
                         variant="ghost"
-                        className="w-full text-gray-100 hover:bg-blue-50 rounded-2xl"
+                        className="w-full text-[261f0f] hover:bg-blue-50 rounded-2xl"
                         onClick={handleViewActivities}
                       >
                         View {selectedDateActivities.length - 3} more events

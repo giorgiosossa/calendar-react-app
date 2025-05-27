@@ -96,7 +96,7 @@ export function ActivityDrawer({
   return (
     <div
       className={cn(
-        "fixed inset-x-0 z-50 transition-all duration-300 ease-in-out rounded-r-lg",
+        "fixed inset-x-0 z-50 transition-all duration-300 ease-in-out rounded-r-lg ",
         isBottom ? (isOpen ? "bottom-0" : "-bottom-full") : isOpen ? "right-0" : "-right-full",
         isBottom ? "h-[85vh] md:h-[80vh]" : "top-0 h-full w-full max-w-md md:w-[400px]",
         !isOpen && "pointer-events-none",
@@ -104,22 +104,22 @@ export function ActivityDrawer({
     >
       <div
         className={cn(
-          "flex h-full flex-col overflow-hidden rounded-t-xl bg-white shadow-lg",
+          "flex h-full flex-col overflow-hidden rounded-t-xl bg-[#ececec] shadow-lg",
           isBottom ? "rounded-t-xl" : "rounded-l-xl",
         )}
       >
         {/* Drawer header */}
-        <div className="flex items-center justify-between border-b bg-gray-50/50 p-4">
+        <div className="flex items-center justify-between border-b bg-[#d7d4d5] p-4 border-transparent">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">{format(selectedDate, "EEEE d, MMMM yyyy")}</h3>
-            <p className="text-sm text-gray-500">
+            <h3 className="text-lg font-semibold text-gray-800">{format(selectedDate, "EEEE d, MMMM yyyy")}</h3>
+            <p className="text-sm text-gray-800">
               {activities.length} {activities.length === 1 ? "activity" : "activities"}
             </p>
           </div>
 
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="icon" onClick={handleClose} className="h-8 w-8 rounded-full">
-              <X className="h-4 w-4" />
+              <X className="h-4 w-4 text-gray-700" />
               <span className="sr-only">Close</span>
             </Button>
           </div>
@@ -128,13 +128,13 @@ export function ActivityDrawer({
         {/* Calendar timeline content */}
         <div className="flex-1 overflow-y-auto">
           {activities.length > 0 ? (
-            <div className="relative">
+            <div className="relative border-transparent">
               {/* Time labels and grid lines */}
-              <div className="absolute left-0 top-0 h-full w-16">
+              <div className="absolute left-0 top-0 h-full w-16 ">
                 {timeLabels.map(({ time, position }) => (
                   <div
                     key={time}
-                    className="absolute left-0 flex items-center text-xs font-medium text-gray-500"
+                    className="absolute left-0 flex items-center text-xs font-medium text-gray-800"
                     style={{ top: position }}
                   >
                     <span className="w-12 pr-2 text-right">{time}</span>
@@ -143,11 +143,11 @@ export function ActivityDrawer({
               </div>
 
               {/* Grid lines */}
-              <div className="absolute left-16 top-0 right-0 h-full">
+              <div className="absolute left-16 top-0 right-0 h-full border-transparent">
                 {timeLabels.map(({ position }) => (
                   <div
                     key={position}
-                    className="absolute left-0 right-0 border-t border-gray-100"
+                    className="absolute left-0 right-0 border-t border-gray-800"
                     style={{ top: position }}
                   />
                 ))}
@@ -188,7 +188,7 @@ export function ActivityDrawer({
         </div>
 
         {/* Drawer handle for mobile */}
-        {isBottom && <div className="absolute left-1/2 top-3 h-1 w-16 -translate-x-1/2 rounded-full bg-gray-300" />}
+        {isBottom && <div className="absolute left-1/2 top-3 h-1 w-16 -translate-x-1/2 rounded-full bg-gray-800 " />}
       </div>
     </div>
   )
