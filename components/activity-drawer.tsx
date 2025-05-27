@@ -98,7 +98,7 @@ export function ActivityDrawer({
       className={cn(
         "fixed inset-x-0 z-50 transition-all duration-300 ease-in-out rounded-r-lg",
         isBottom ? (isOpen ? "bottom-0" : "-bottom-full") : isOpen ? "right-0" : "-right-full",
-        isBottom ? "h-[70vh] md:h-[60vh]" : "top-0 h-full w-full max-w-md md:w-[400px]",
+        isBottom ? "h-[85vh] md:h-[80vh]" : "top-0 h-full w-full max-w-md md:w-[400px]",
         !isOpen && "pointer-events-none",
       )}
     >

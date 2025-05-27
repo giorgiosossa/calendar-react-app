@@ -1,12 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { CalendarView } from "../components/calendar-view"
 import { ActivityDrawer } from "../components/activity-drawer"
 import { Button } from "../components/ui/button"
-import { Plus, Calendar, Clock, Home, Settings, User } from "lucide-react"
+import { Plus, Calendar } from "lucide-react"
 import { CreateActivityDialog } from "../components/create-activity-dialog"
 import { useMediaQuery } from "../hooks/use-media-query"
+import WelcomeCard from "../components/welcome-card"
 
 // Sample user data
 const userData = {
@@ -74,10 +75,16 @@ export default function CalendarPage() {
   const [selectedDate, setSelectedDate] = useState(new Date())
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+  const [scrollY, setScrollY] = useState(0)
+  const [isStacked, setIsStacked] = useState(false)
 
   const isMobile = useMediaQuery("(max-width: 768px)")
   const isTablet = useMediaQuery("(min-width: 769px) and (max-width: 1099px)")
   const isDesktop = useMediaQuery("(min-width: 1100px)")
+
+  const summaryCardRef = useRef(null)
+  const calendarCardRef = useRef(null)
+  const activitiesCardRef = useRef(null)
 
   // Format the selected date to match the activity date format for filtering
   const formattedSelectedDate = selectedDate.toISOString().split("T")[0]
@@ -90,6 +97,42 @@ export default function CalendarPage() {
     const today = new Date().toISOString().split("T")[0]
     return activity.date === today
   })
+
+  // Scroll effect for mobile card stacking
+  useEffect(() => {
+    if (isDesktop) return
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY
+      setScrollY(currentScrollY)
+
+      // Threshold for when to start stacking (adjust as needed)
+      const stackThreshold = 100
+
+      if (currentScrollY > stackThreshold && !isStacked) {
+        setIsStacked(true)
+      } else if (currentScrollY <= stackThreshold && isStacked) {
+        setIsStacked(false)
+      }
+    }
+
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [isDesktop, isStacked])
+
+  // Calculate transform values for stacking effect
+  const getCardTransform = (cardIndex) => {
+    if (isDesktop || !isStacked) return {}
+
+    const baseOffset = 20 // Base offset for stacking
+    const scaleReduction = 0.05 // How much to scale down each card
+
+    return {
+      transform: `translateY(-${cardIndex * baseOffset}px) scale(${1 - cardIndex * scaleReduction})`,
+      zIndex: 10 - cardIndex,
+      transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+    }
+  }
 
   // Handle viewing activities - different behavior for mobile/tablet vs desktop
   const handleViewActivities = () => {
@@ -105,53 +148,49 @@ export default function CalendarPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white pb-20 overflow-hidden">
+    <div className="min-h-screen bg-white pb-2 overflow-hidden">
       {/* Main Content */}
-      <div className="pb-4">
+      <div className="pb-2">
         {/* Content Grid */}
-        <div className="max-w-full mx-auto px-4 py-6">
+        <div className="max-w-full mx-auto px-3 py-1">
           <div className={`${isDesktop ? "grid grid-cols-12 gap-6 h-screen pl-96" : "space-y-4"}`}>
             {/* Main Content - Left Side */}
             <div className={`${isDesktop ? "col-span-9" : "w-full"} space-y-4`}>
-              {/* Welcome Card */}
-              <div className="bg-white rounded-3xl p-6 ">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h1 className={`${isMobile ? "text-xl" : "text-2xl"} font-bold text-gray-900 leading-tight`}>
-                      Buen día
-                      <br />
-                      {userData.name}!
-                    </h1>
-                  </div>
-                </div>
-              </div>
+              <main className="">
+                <WelcomeCard />
+              </main>
 
               {/* Today's Summary Card */}
-              <div className="bg-white rounded-3xl p-4 shadow-sm border border-gray-100">
-                <div className="flex items-center justify-between mb-3">
+              <div
+                ref={summaryCardRef}
+                className="bg-[#ae8276] rounded-2xl p-4 shadow-md relative"
+                style={!isDesktop ? getCardTransform(0) : {}}
+              >
+                <div className="flex items-center justify-between mb-1">
                   <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                      <Clock className="w-5 h-5 text-blue-600" />
-                    </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900">Actividades para hoy</h3>
-                      <p className="text-sm text-gray-500">{todayActivities.length} actividades planeadas</p>
+                      <h3 className="font-semibold text-white">CLARA ha agendado</h3>
+                      <p className="text-sm text-white">{todayActivities.length} actividades</p>
                     </div>
                   </div>
                   {!isDesktop && (
                     <Button
                       size="sm"
-                      className="bg-blue-700 hover:bg-blue-800 text-white rounded-full px-4"
+                      className="bg-[#272624] hover:bg-[#272624] text-white rounded-full px-4"
                       onClick={handleViewActivities}
                     >
-                      View
+                      Ver
                     </Button>
                   )}
                 </div>
               </div>
 
               {/* Calendar Card */}
-              <div className="bg-blue-700 rounded-3xl p-4 shadow-sm">
+              <div
+                ref={calendarCardRef}
+                className="bg-[#899387] rounded-3xl p-4 shadow-sm relative"
+                style={!isDesktop ? getCardTransform(1) : {}}
+              >
                 <CalendarView
                   selectedDate={selectedDate}
                   onSelectDate={handleDateSelect}
@@ -160,7 +199,7 @@ export default function CalendarPage() {
                 <div className="mt-4">
                   <Button
                     onClick={() => setIsCreateDialogOpen(true)}
-                    className="w-full bg-blue-600 hover:bg-blue-800 text-white rounded-2xl h-12 flex items-center justify-center space-x-2"
+                    className="w-full bg-[#343b34] hover:bg-[#899387] text-white rounded-2xl h-12 flex items-center justify-center space-x-2"
                   >
                     <Plus className="w-5 h-5" />
                     <span>Create New Event</span>
@@ -170,25 +209,29 @@ export default function CalendarPage() {
 
               {/* Activities Preview Card - Mobile/Tablet Only */}
               {!isDesktop && selectedDateActivities.length > 0 && (
-                <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+                <div
+                  ref={activitiesCardRef}
+                  className="bg-[#232323] rounded-3xl p-6 shadow-sm border border-gray-100 relative"
+                  style={getCardTransform(2)}
+                >
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-semibold text-gray-900">
+                    <h3 className="font-semibold text-gray-100">
                       {selectedDate.toLocaleDateString("en-US", {
                         weekday: "long",
                         month: "long",
                         day: "numeric",
                       })}
                     </h3>
-                    <span className="text-sm text-gray-500">{selectedDateActivities.length} events</span>
+                    <span className="text-sm text-gray-100">{selectedDateActivities.length} events</span>
                   </div>
 
                   <div className="space-y-3">
                     {selectedDateActivities.slice(0, 3).map((activity) => (
-                      <div key={activity.id} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-2xl">
+                      <div key={activity.id} className="flex items-center space-x-3 p-0 bg-[#232323] rounded-2xl">
                         <div className={`w-3 h-3 rounded-full ${activity.color}`}></div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-gray-900 truncate">{activity.name}</p>
-                          <p className="text-sm text-gray-500">
+                          <p className="font-medium text-gray-100 truncate">{activity.name}</p>
+                          <p className="text-sm text-gray-100">
                             {activity.startTime} - {activity.endTime}
                           </p>
                         </div>
@@ -198,7 +241,7 @@ export default function CalendarPage() {
                     {selectedDateActivities.length > 3 && (
                       <Button
                         variant="ghost"
-                        className="w-full text-blue-600 hover:bg-blue-50 rounded-2xl"
+                        className="w-full text-gray-100 hover:bg-blue-50 rounded-2xl"
                         onClick={handleViewActivities}
                       >
                         View {selectedDateActivities.length - 3} more events
@@ -248,9 +291,7 @@ export default function CalendarPage() {
                 <div className="bg-white rounded-3xl shadow-lg border border-gray-200 h-full overflow-hidden">
                   <div className="p-6 border-b border-gray-100">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-semibold text-gray-900 text-lg">
-                        Activities
-                      </h3>
+                      <h3 className="font-semibold text-gray-900 text-lg">Activities</h3>
                       <span className="text-sm text-gray-500">{selectedDateActivities.length} events</span>
                     </div>
                     <p className="text-sm text-gray-600 mt-1">
@@ -261,20 +302,29 @@ export default function CalendarPage() {
                       })}
                     </p>
                   </div>
-                  
+
                   <div className="h-full overflow-hidden">
                     {selectedDateActivities.length > 0 ? (
                       <div className="h-full overflow-y-auto p-6 space-y-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                         {selectedDateActivities.map((activity) => (
-                          <div key={activity.id} className="p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl border border-gray-200 hover:shadow-md transition-all duration-200">
+                          <div
+                            key={activity.id}
+                            className="p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl border border-gray-200 hover:shadow-md transition-all duration-200"
+                          >
                             <div className="flex items-start space-x-3">
-                              <div className={`w-5 h-5 rounded-full ${activity.color} mt-1 flex-shrink-0 shadow-sm`}></div>
+                              <div
+                                className={`w-5 h-5 rounded-full ${activity.color} mt-1 flex-shrink-0 shadow-sm`}
+                              ></div>
                               <div className="flex-1 min-w-0">
                                 <h4 className="font-semibold text-gray-900 mb-2 text-base">{activity.name}</h4>
                                 <p className="text-sm text-gray-600 mb-3 leading-relaxed">{activity.description}</p>
                                 <div className="flex items-center justify-between text-sm mb-3">
-                                  <span className="font-medium text-blue-600">{activity.startTime} - {activity.endTime}</span>
-                                  <span className="bg-white px-3 py-1 rounded-full text-xs font-medium text-gray-700 shadow-sm">{activity.genre}</span>
+                                  <span className="font-medium text-blue-600">
+                                    {activity.startTime} - {activity.endTime}
+                                  </span>
+                                  <span className="bg-white px-3 py-1 rounded-full text-xs font-medium text-gray-700 shadow-sm">
+                                    {activity.genre}
+                                  </span>
                                 </div>
                                 {activity.tags && activity.tags.length > 0 && (
                                   <div className="flex flex-wrap gap-2">
@@ -292,7 +342,7 @@ export default function CalendarPage() {
                             </div>
                           </div>
                         ))}
-                        
+
                         {/* Spacer para asegurar scroll */}
                         <div className="h-4"></div>
                       </div>

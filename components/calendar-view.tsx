@@ -80,7 +80,7 @@ export function CalendarView({ selectedDate, onSelectDate, activities }: Calenda
   }
 
   return (
-    <div className="rounded-xl border border-blue-700 bg-blue-700 p-4 shadow-sm">
+    <div className="rounded-xl border border-[#899387] bg-[#899387] p-4 shadow-sm">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold text-white">{format(firstDayCurrentMonth, "MMMM yyyy")}</h2>
         <div className="flex items-center space-x-2">
@@ -123,12 +123,12 @@ export function CalendarView({ selectedDate, onSelectDate, activities }: Calenda
               onClick={() => onSelectDate(day)}
               className={cn(
                 "mx-auto flex h-10 w-10 items-center justify-center rounded-full transition-colors",
-                isEqual(day, selectedDate) && "bg-pink-300  font-medium",
+                isEqual(day, selectedDate) && "bg-[#343b34]  font-medium",
                 !isEqual(day, selectedDate) && isToday(day) && "text-white font-medium border border-white",
                 !isEqual(day, selectedDate) &&
                   !isToday(day) &&
                   isSameMonth(day, firstDayCurrentMonth) &&
-                  "text-blue-900 hover:bg-gray-100",
+                  "text-[#343b34] hover:bg-[#343b34]",
                 !isEqual(day, selectedDate) &&
                   !isToday(day) &&
                   !isSameMonth(day, firstDayCurrentMonth) &&
