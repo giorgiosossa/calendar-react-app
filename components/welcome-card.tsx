@@ -12,7 +12,7 @@ interface WelcomeCardProps {
 
 export default function WelcomeCard({
   userName = "Isabella Martinez",
-  greeting = "Buen día",
+  greeting = "cI.ara",
   date = "Last Update Monday, 16 Jul",
   showLogo = true,
   onClaraToggle,
@@ -43,7 +43,7 @@ export default function WelcomeCard({
             <>
               {/* CLARA Label at top */}
               <div className="pt-2">
-                <span className="text-sm font-medium text-gray-400">CLARA</span>
+                <span className="text-sm font-medium text-gray-400">cI.ara</span>
               </div>
               
               {/* Switch aligned with userName */}
