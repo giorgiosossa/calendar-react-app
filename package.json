@@ -22,7 +22,8 @@
     "next": "latest",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "tailwind-merge": "^3.3.0"
+    "tailwind-merge": "^3.3.0",
+    "tw-animate-css": "^1.3.0"
   },
   "devDependencies": {
     "@types/node": "17.0.4",

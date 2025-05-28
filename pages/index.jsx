@@ -28,8 +28,8 @@ const userData = {
       id: 2,
       name: "History of UX design",
       description: "Lecture on the evolution of user experience design principles",
-      startTime: "17:00",
-      endTime: "19:30",
+      startTime: "12:00",
+      endTime: "13:30",
       date: "2025-05-14",
       tags: ["Education", "Design"],
       genre: "Academic",
@@ -85,6 +85,10 @@ export default function CalendarPage() {
   const summaryCardRef = useRef(null)
   const calendarCardRef = useRef(null)
   const activitiesCardRef = useRef(null)
+  
+  const handleClaraToggle = (enabled) => {
+    console.log('CLARA está:', enabled ? 'activada' : 'desactivada')
+  }
 
   // Format the selected date to match the activity date format for filtering
   const formattedSelectedDate = selectedDate.toISOString().split("T")[0]
@@ -147,8 +151,25 @@ export default function CalendarPage() {
     // Don't auto-open drawer on date selection
   }
 
+  const handleCreateActivity = () => {
+    setIsCreateDialogOpen(true)
+  }
+
   return (
     <div className="min-h-screen bg-white pb-2 overflow-hidden">
+      {/* Desktop Static ActivityDrawer - Left Side */}
+      {isDesktop && (
+        <ActivityDrawer
+          isOpen={true}
+          onClose={() => {}} // No se usa en modo estático
+          activities={selectedDateActivities}
+          selectedDate={selectedDate}
+          position="left"
+          isStatic={true}
+          onCreateActivity={handleCreateActivity}
+        />
+      )}
+
       {/* Main Content */}
       <div className="pb-2">
         {/* Content Grid */}
@@ -157,7 +178,7 @@ export default function CalendarPage() {
             {/* Main Content - Left Side */}
             <div className={`${isDesktop ? "col-span-9" : "w-full"} space-y-4`}>
               <main className="">
-                <WelcomeCard />
+                <WelcomeCard onClaraToggle={handleClaraToggle}  />
               </main>
 
               {/* Today's Summary Card */}
@@ -198,11 +219,11 @@ export default function CalendarPage() {
                 />
                 <div className="mt-4">
                   <Button
-                    onClick={() => setIsCreateDialogOpen(true)}
-                    className="w-full bg-[#343b34] hover:bg-[#899387] text-white rounded-2xl h-12 flex items-center justify-center space-x-2"
+                    onClick={handleCreateActivity}
+                    className="w-full bg-[#343b34] hover:bg-black text-white rounded-2xl h-12 flex items-center justify-center space-x-2"
                   >
                     <Plus className="w-5 h-5" />
-                    <span>Create New Event</span>
+                    <span>Crear Evento</span>
                   </Button>
                 </div>
               </div>
@@ -222,7 +243,7 @@ export default function CalendarPage() {
                         day: "numeric",
                       })}
                     </h3>
-                    <span className="text-sm text-[261f0f]">{selectedDateActivities.length} events</span>
+                    <span className="text-sm text-[261f0f]">{selectedDateActivities.length} eventos</span>
                   </div>
 
                   <div className="space-y-3">
@@ -244,7 +265,7 @@ export default function CalendarPage() {
                         className="w-full text-[261f0f] hover:bg-blue-50 rounded-2xl"
                         onClick={handleViewActivities}
                       >
-                        View {selectedDateActivities.length - 3} more events
+                        Ver {selectedDateActivities.length - 3} eventos más
                       </Button>
                     )}
                   </div>
@@ -254,13 +275,13 @@ export default function CalendarPage() {
 
             {/* Desktop Center Column - Quick Actions */}
             {isDesktop && (
-              <div className="col-span-3 space-y-4">
-                <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
-                  <h3 className="font-semibold text-gray-900 mb-4">Atajos</h3>
+              <div className="col-span-3 space-y-4 mt-2">
+                <div className="bg-[#899387] rounded-3xl p-6 shadow-sm border border-gray-100">
+                  <h3 className="font-semibold text-gray-200 mb-4">Atajos</h3>
                   <div className="space-y-3">
                     <Button
-                      onClick={() => setIsCreateDialogOpen(true)}
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-2xl h-12"
+                      onClick={handleCreateActivity}
+                      className="w-full bg-[#343b34] hover:bg-black text-white rounded-2xl h-12"
                     >
                       <Plus className="w-5 h-5 mr-2" />
                       Nuevo Evento
@@ -270,98 +291,18 @@ export default function CalendarPage() {
 
                 {/* Selected Date Summary */}
                 {selectedDateActivities.length > 0 && (
-                  <div className="bg-white rounded-3xl p-4 shadow-sm border border-gray-100">
+                  <div className="bg-[#c9b096] rounded-3xl p-4 shadow-sm border border-gray-100">
                     <div className="text-center">
-                      <h3 className="font-semibold text-gray-900 text-sm">
+                      <h3 className="font-semibold text-gray-100 text-sm">
                         {selectedDate.toLocaleDateString("en-US", {
                           month: "short",
                           day: "numeric",
                         })}
                       </h3>
-                      <p className="text-xs text-gray-500">{selectedDateActivities.length} events</p>
+                      <p className="text-xs text-gray-100">{selectedDateActivities.length} eventos</p>
                     </div>
                   </div>
                 )}
-              </div>
-            )}
-
-            {/* Desktop Left Column - Activities Drawer (Fixed) */}
-            {isDesktop && (
-              <div className="fixed left-4 top-4 w-80 h-[97vh] z-10">
-                <div className="bg-white rounded-3xl shadow-lg border border-gray-200 h-full overflow-hidden">
-                  <div className="p-6 border-b border-gray-100">
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-semibold text-gray-900 text-lg">Activities</h3>
-                      <span className="text-sm text-gray-500">{selectedDateActivities.length} events</span>
-                    </div>
-                    <p className="text-sm text-gray-600 mt-1">
-                      {selectedDate.toLocaleDateString("en-US", {
-                        weekday: "long",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </p>
-                  </div>
-
-                  <div className="h-full overflow-hidden">
-                    {selectedDateActivities.length > 0 ? (
-                      <div className="h-full overflow-y-auto p-6 space-y-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-                        {selectedDateActivities.map((activity) => (
-                          <div
-                            key={activity.id}
-                            className="p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl border border-gray-200 hover:shadow-md transition-all duration-200"
-                          >
-                            <div className="flex items-start space-x-3">
-                              <div
-                                className={`w-5 h-5 rounded-full ${activity.color} mt-1 flex-shrink-0 shadow-sm`}
-                              ></div>
-                              <div className="flex-1 min-w-0">
-                                <h4 className="font-semibold text-gray-900 mb-2 text-base">{activity.name}</h4>
-                                <p className="text-sm text-gray-600 mb-3 leading-relaxed">{activity.description}</p>
-                                <div className="flex items-center justify-between text-sm mb-3">
-                                  <span className="font-medium text-blue-600">
-                                    {activity.startTime} - {activity.endTime}
-                                  </span>
-                                  <span className="bg-white px-3 py-1 rounded-full text-xs font-medium text-gray-700 shadow-sm">
-                                    {activity.genre}
-                                  </span>
-                                </div>
-                                {activity.tags && activity.tags.length > 0 && (
-                                  <div className="flex flex-wrap gap-2">
-                                    {activity.tags.map((tag, index) => (
-                                      <span
-                                        key={index}
-                                        className="text-xs bg-blue-500 text-white px-3 py-1 rounded-full font-medium shadow-sm"
-                                      >
-                                        {tag}
-                                      </span>
-                                    ))}
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-
-                        {/* Spacer para asegurar scroll */}
-                        <div className="h-4"></div>
-                      </div>
-                    ) : (
-                      <div className="flex flex-col items-center justify-center h-full p-6">
-                        <Calendar className="w-16 h-16 text-gray-300 mb-4" />
-                        <h4 className="font-medium text-gray-700 mb-2">No events scheduled</h4>
-                        <p className="text-gray-500 text-center text-sm mb-4">Create your first event for this date</p>
-                        <Button
-                          onClick={() => setIsCreateDialogOpen(true)}
-                          className="bg-blue-600 hover:bg-blue-700 text-white rounded-2xl px-6"
-                        >
-                          <Plus className="w-4 h-4 mr-2" />
-                          Create Event
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </div>
               </div>
             )}
           </div>
@@ -376,6 +317,7 @@ export default function CalendarPage() {
           activities={selectedDateActivities}
           selectedDate={selectedDate}
           position="bottom"
+          isStatic={false}
         />
       )}
 
